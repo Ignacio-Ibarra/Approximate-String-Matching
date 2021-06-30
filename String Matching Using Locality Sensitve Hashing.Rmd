@@ -55,7 +55,7 @@ text_cleaning = function(text){
   text = gsub('\\b\\S+\\b', " ", text)
   return(text)
 } 
-
+ 
 unicos_sucios$first_cleaning <- text_cleaning(unicos_sucios$prove_dest)
 
 ```
