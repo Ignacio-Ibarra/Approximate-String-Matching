@@ -1,0 +1,66 @@
+---
+title: "Approximate String Matching with Locality Sensitive Hashing"
+output: html_notebook
+---
+
+### Montando Google Drive en la sesión de RStudio
+```{r}
+library(googledrive)
+drive_auth()
+```
+
+### Descargando base a disco local
+```{r}
+base_googledrive_id <- drive_get(path = "https://drive.google.com/file/d/1yJWv5YFDBpDAWIFfMz_azi8mzouFqbba/view?usp=sharing")$id
+
+localpath_data = "C:/Users/Asus/Desktop/CEP/base_importadores/base.csv"
+
+drive_download(file = as_id(base_googledrive_id), path = localpath_data, overwrite = FALSE)
+```
+
+### Cargando librerías a utilizar
+```{r}
+
+library(readr)
+library(tm)
+library(stringi)
+library(textreuse)
+library(dplyr)
+```
+
+###Leyendo base
+```{r}
+base <- read.csv(localpath_data)
+head(base)
+```
+
+### Obtención de Valores Sucios Unicos
+```{r}
+unicos_sucios <- base %>%
+                    distinct(prove_dest)
+
+head(unicos_sucios)
+```
+
+### Función de Limpieza
+```{r}
+
+text_cleaning = function(text){
+  text = toupper(text)
+  text = gsub('\\([^()]*\\)', ' ', text)
+  text = gsub("[^[:alnum:][:blank:]?&/\\-]", ' ', text)
+  text = gsub('\\b\\d+\\b',' ', text)
+  #text = gsub("[/_-]", " ", text)
+  text = stri_trans_general(text, id="Latin-ASCII")
+  text = gsub('\\b\\S+\\b', " ", text)
+  return(text)
+}
+
+unicos_sucios$first_cleaning <- text_cleaning(unicos_sucios$prove_dest)
+
+```
+
+```{r}
+unicos_sucios[1:1000,]
+```
+
